@@ -1,38 +1,37 @@
 name: Docker Build and Push
-
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-
 env:
   REGISTRY: docker.io
   IMAGE_NAME: ${{ github.repository }}
-
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Generate version
+      - name: Generate version and build timestamp
         id: version
         run: |
           VERSION=$(date +'%Y.%m.%d')
+          TIMESTAMP=$(date +%s)
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "TIMESTAMP=$TIMESTAMP" >> $GITHUB_OUTPUT
           
           # Update Cargo.toml version
           sed -i "s/^version = \".*\"/version = \"$VERSION\"/" Cargo.toml
           
           echo "Version set to: $VERSION"
+          echo "Build timestamp: $TIMESTAMP"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -54,5 +53,9 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.VERSION }}
           build-args: |
             VERSION=${{ steps.version.outputs.VERSION }}
+            BUILD_TIMESTAMP=${{ steps.version.outputs.TIMESTAMP }}
+            GITHUB_SHA=${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          no-cache: true
+          pull: true

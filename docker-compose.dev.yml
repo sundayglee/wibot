@@ -6,7 +6,8 @@ services:
     environment:
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - XAI_API_TOKEN=${XAI_API_TOKEN}
-      - RUST_LOG=${RUST_LOG}
+      - RUST_LOG=${RUST_LOG}      
+      - BOT_OWNER_ID=${BOT_OWNER_ID}
     volumes:
       - ./data:/app/data
     restart: unless-stopped

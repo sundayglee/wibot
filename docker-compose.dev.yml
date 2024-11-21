@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  task-bot:
+    build: .
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - XAI_API_TOKEN=${XAI_API_TOKEN}
+      - RUST_LOG=${RUST_LOG}
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
